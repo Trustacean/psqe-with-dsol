@@ -1,9 +1,0 @@
-org\trustacean\pubsubqe\Model.class
-org\trustacean\pubsubqe\Sim.class
-org\trustacean\pubsubqe\util\StatisticsCollector.class
-org\trustacean\pubsubqe\util\DatasetLoader.class
-org\trustacean\pubsubqe\core\Publisher.class
-org\trustacean\pubsubqe\core\Subscriber.class
-org\trustacean\pubsubqe\util\DatasetEventGenerator.class
-org\trustacean\pubsubqe\core\Message.class
-org\trustacean\pubsubqe\core\Broker.class
