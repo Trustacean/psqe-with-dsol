@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.djutils.event.Event;
 import org.djutils.event.EventListener;
-import org.trustacean.pubsubqe.core.Broker;
 import org.trustacean.pubsubqe.core.Message;
 import org.trustacean.pubsubqe.core.Subscriber;
 
@@ -19,6 +18,17 @@ public class StatisticsCollector implements EventListener {
     private int eventCount = 0;
     private final Set<String> contexts;
     private final Map<String, Integer> contextCounts;
+    private final Map<Subscriber, Integer> subscriberMessageCounts = new HashMap<>();
+
+    private final Map<Subscriber, Integer> truePositiveCounts = new HashMap<>();
+    private final Map<Subscriber, Integer> falsePositiveCounts = new HashMap<>();
+    private final Map<Subscriber, Integer> falseNegativeCounts = new HashMap<>();
+    private final Map<Subscriber, Integer> trueNegativeCounts = new HashMap<>();
+
+    private int overallTruePositiveCount = 0;
+    private int overallFalsePositiveCount = 0;
+    private int overallFalseNegativeCount = 0;
+    private int overallTrueNegativeCount = 0;
 
     public StatisticsCollector() {
         contexts = new HashSet<>();
@@ -29,11 +39,21 @@ public class StatisticsCollector implements EventListener {
     public void notify(Event event) {
         eventCount++;
 
-        if (event.getType() == Message.MESSAGE_EVENT) {
+        if (event.getType().equals(Message.MESSAGE_PUBLISHED_EVENT)) {
             account(event);
         }
 
-        if (event.getType() == DevsSimulator.STOP_EVENT) {
+        if (event.getType().equals(Message.MESSAGE_DELIVERED_EVENT)) {
+            Subscriber subscriber = (Subscriber) event.getContent();
+            increment(subscriberMessageCounts, subscriber);
+        }
+
+        if (event.getType().equals(MatchResult.MATCH_RESULT_EVENT)) {
+            MatchResult result = (MatchResult) event.getContent();
+            updateConfusionMatrix(result);
+        }
+
+        if (event.getType().equals(DevsSimulator.STOP_EVENT)) {
             printStatistics();
         }
     }
@@ -45,8 +65,33 @@ public class StatisticsCollector implements EventListener {
         contextCounts.put(msg.getContext(), contextCounts.getOrDefault(msg.getContext(), 0) + 1);
     }
 
+    private void updateConfusionMatrix(MatchResult result) {
+        Subscriber subscriber = result.getSubscriber();
+        boolean matches = result.isMatches();
+        boolean isRelevant = result.isRelevant();
+
+        if (matches && isRelevant) {
+            increment(truePositiveCounts, subscriber);
+            overallTruePositiveCount++;
+        } else if (matches) {
+            increment(falsePositiveCounts, subscriber);
+            overallFalsePositiveCount++;
+        } else if (isRelevant) {
+            increment(falseNegativeCounts, subscriber);
+            overallFalseNegativeCount++;
+        } else {
+            increment(trueNegativeCounts, subscriber);
+            overallTrueNegativeCount++;
+        }
+    }
+
+    private void increment(Map<Subscriber, Integer> map, Subscriber subscriber) {
+        map.put(subscriber, map.getOrDefault(subscriber, 0) + 1);
+    }
+
     private void printStatistics() {
         System.out.println("Ts Stopped");
+        System.out.println("Calculating statistics...");
         System.out.println("Events count : " + eventCount);
 
         for (String context : contexts) {
@@ -54,20 +99,12 @@ public class StatisticsCollector implements EventListener {
             System.out.println("Messages: " + contextCounts.get(context));
         }
         System.out.println();
-        Map<Subscriber, Integer> subscriberMessageCounts = Broker.getSubscriberMessageCounts();
+        
         for (Subscriber subscriber : subscriberMessageCounts.keySet()) {
             System.out.print("Subscriber: " + Arrays.toString(subscriber.getKeywords()) + " - ");
             System.out.println("Messages: " + subscriberMessageCounts.get(subscriber));
         }
-
-        Map<Subscriber, Integer> truePositiveCounts = Broker.getTruePositiveCounts();
-        Map<Subscriber, Integer> falsePositiveCounts = Broker.getFalsePositiveCounts();
-        Map<Subscriber, Integer> falseNegativeCounts = Broker.getFalseNegativeCounts();
-        Map<Subscriber, Integer> trueNegativeCounts = Broker.getTrueNegativeCounts();
-        Integer overallTruePositiveCount = Broker.getOverallTruePositiveCount();
-        Integer overallFalsePositiveCount = Broker.getOverallFalsePositiveCount();
-        Integer overallFalseNegativeCount = Broker.getOverallFalseNegativeCount();
-        Integer overallTrueNegativeCount = Broker.getOverallTrueNegativeCount();
+        System.out.println();
 
         for (Subscriber subscriber : subscriberMessageCounts.keySet()) {
             int tp = truePositiveCounts.getOrDefault(subscriber, 0);
@@ -82,10 +119,5 @@ public class StatisticsCollector implements EventListener {
             System.out.println("True Negatives: " + tn);
             System.out.println();
         }
-
-        System.out.println("Overall True Positives: " + overallTruePositiveCount);
-        System.out.println("Overall False Positives: " + overallFalsePositiveCount);
-        System.out.println("Overall False Negatives: " + overallFalseNegativeCount);
-        System.out.println("Overall True Negatives: " + overallTrueNegativeCount);
     }
 }

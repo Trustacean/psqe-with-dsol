@@ -6,9 +6,10 @@ import org.trustacean.pubsubqe.core.Broker;
 import org.trustacean.pubsubqe.core.Message;
 import org.trustacean.pubsubqe.core.Publisher;
 import org.trustacean.pubsubqe.core.Subscriber;
-import org.trustacean.pubsubqe.util.DatasetEventGenerator;
-import org.trustacean.pubsubqe.util.DatasetLoader;
-import org.trustacean.pubsubqe.util.StatisticsCollector;
+import org.trustacean.pubsubqe.dataset.DatasetEventGenerator;
+import org.trustacean.pubsubqe.dataset.DatasetLoader;
+import org.trustacean.pubsubqe.stats.MatchResult;
+import org.trustacean.pubsubqe.stats.StatisticsCollector;
 
 import nl.tudelft.simulation.dsol.model.AbstractDsolModel;
 import nl.tudelft.simulation.dsol.simulators.DevsSimulator;
@@ -34,7 +35,9 @@ public class Model extends AbstractDsolModel<Double, DevsSimulatorInterface<Doub
                 = createGenerator(dataset, publisher);
 
         StatisticsCollector stats = new StatisticsCollector();
-        publisher.addListener(stats, Message.MESSAGE_EVENT);
+        publisher.addListener(stats, Message.MESSAGE_PUBLISHED_EVENT);
+        broker.addListener(stats, MatchResult.MATCH_RESULT_EVENT);
+        broker.addListener(stats, Message.MESSAGE_DELIVERED_EVENT);
         simulator.addListener(stats, DevsSimulator.STOP_EVENT);
 
         generator.start();
@@ -46,7 +49,7 @@ public class Model extends AbstractDsolModel<Double, DevsSimulatorInterface<Doub
 
     private Broker createBroker(Publisher publisher) {
         Broker broker = new Broker();
-        publisher.addListener(broker, Message.MESSAGE_EVENT);
+        publisher.addListener(broker, Message.MESSAGE_PUBLISHED_EVENT);
         return broker;
     }
 

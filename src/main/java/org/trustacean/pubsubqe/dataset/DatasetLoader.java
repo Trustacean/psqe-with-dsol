@@ -8,7 +8,7 @@ import org.trustacean.pubsubqe.core.Message;
 
 public class DatasetLoader {
 
-    private static final String PATH = "./src/main/java/org/trustacean/pubsubqe/input/";
+    private static final String PATH = "./src/main/java/org/trustacean/pubsubqe/resources/";
     private static final String DEFAULT_FILE_NAME = "dataset.csv";
     private static final String DEFAULT_CONTEXT_FILE_NAME = "context.csv";
 
