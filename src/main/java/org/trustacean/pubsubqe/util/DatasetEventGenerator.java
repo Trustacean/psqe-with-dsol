@@ -22,11 +22,10 @@ public class DatasetEventGenerator {
     private int index = 0;
 
     public DatasetEventGenerator(
-        DevsSimulatorInterface<Double> simulator, 
-        List<Message> dataset, 
-        Publisher publisher, 
-        StreamInterface stream) 
-    {
+            DevsSimulatorInterface<Double> simulator,
+            List<Message> dataset,
+            Publisher publisher,
+            StreamInterface stream) {
         this.simulator = simulator;
         this.dataset = dataset;
         this.publisher = publisher;
@@ -48,15 +47,19 @@ public class DatasetEventGenerator {
         double delay = interArrival.draw();
 
         simulator.scheduleEventRel(
-            delay,
-            this,
-            "generate",
-            new Object[] {});
+                delay,
+                this,
+                "generate",
+                new Object[]{index == dataset.size() - 1});
     }
 
-    public void generate() {
+    public void generate(boolean isLast) {
         Message msg = dataset.get(index++);
         publisher.publish(msg);
         scheduleNext();
+
+        if (isLast) {
+            simulator.endReplication();
+        }
     }
 }
