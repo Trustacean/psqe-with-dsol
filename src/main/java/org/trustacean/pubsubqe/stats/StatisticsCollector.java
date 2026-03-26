@@ -1,4 +1,4 @@
-package org.trustacean.pubsubqe.util;
+package org.trustacean.pubsubqe.stats;
 
 import java.util.Arrays;
 import java.util.HashMap;

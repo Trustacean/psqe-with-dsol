@@ -1,4 +1,4 @@
-package org.trustacean.pubsubqe.util;
+package org.trustacean.pubsubqe.dataset;
 
 import java.util.Collections;
 import java.util.List;
