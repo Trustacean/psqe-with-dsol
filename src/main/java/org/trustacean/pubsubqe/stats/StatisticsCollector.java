@@ -13,6 +13,7 @@ import org.trustacean.pubsubqe.core.Subscriber;
 
 import nl.tudelft.simulation.dsol.simulators.DevsSimulator;
 
+@Deprecated
 public class StatisticsCollector implements EventListener {
 
     private int eventCount = 0;
@@ -30,11 +31,13 @@ public class StatisticsCollector implements EventListener {
     private int overallFalseNegativeCount = 0;
     private int overallTrueNegativeCount = 0;
 
+    @Deprecated
     public StatisticsCollector() {
         contexts = new HashSet<>();
         contextCounts = new HashMap<>();
     }
 
+    @Deprecated
     @Override
     public void notify(Event event) {
         eventCount++;
