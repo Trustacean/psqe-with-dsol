@@ -4,9 +4,8 @@ import java.util.List;
 
 import org.trustacean.pubsubqe.core.*;
 import org.trustacean.pubsubqe.dataset.*;
-import org.trustacean.pubsubqe.dataset.DatasetLoader;
+import org.trustacean.pubsubqe.report.*;
 import org.trustacean.pubsubqe.stats.MatchResult;
-import org.trustacean.pubsubqe.stats.StatisticsCollector;
 
 import nl.tudelft.simulation.dsol.model.AbstractDsolModel;
 import nl.tudelft.simulation.dsol.simulators.DevsSimulator;
@@ -31,11 +30,7 @@ public class Model extends AbstractDsolModel<Double, DevsSimulatorInterface<Doub
         DatasetEventGenerator generator
                 = createGenerator(dataset, publisher);
 
-        StatisticsCollector stats = new StatisticsCollector();
-        publisher.addListener(stats, Message.MESSAGE_PUBLISHED_EVENT);
-        broker.addListener(stats, MatchResult.MATCH_RESULT_EVENT);
-        broker.addListener(stats, Message.MESSAGE_DELIVERED_EVENT);
-        simulator.addListener(stats, DevsSimulator.STOP_EVENT);
+        initReports(broker, publisher);
 
         generator.start();
     }
@@ -126,5 +121,17 @@ public class Model extends AbstractDsolModel<Double, DevsSimulatorInterface<Doub
                 publisher,
                 stream
         );
+    }
+
+    private void initReports(Broker broker, Publisher publisher) {
+        Report cmr = new ConfusionMatrixReport("confusion_matrix");
+        broker.addListener(cmr, MatchResult.MATCH_RESULT_EVENT);
+        simulator.addListener(cmr, DevsSimulator.STOP_EVENT);
+        Report ocmr = new OverallConfusionMatrixReport("overall_confusion_matrix");
+        broker.addListener(ocmr, MatchResult.MATCH_RESULT_EVENT);
+        simulator.addListener(ocmr, DevsSimulator.STOP_EVENT);
+        Report eccr = new EventContextCountReport("event_context_counts");
+        publisher.addListener(eccr, Message.MESSAGE_PUBLISHED_EVENT);
+        simulator.addListener(eccr, DevsSimulator.STOP_EVENT);
     }
 }
