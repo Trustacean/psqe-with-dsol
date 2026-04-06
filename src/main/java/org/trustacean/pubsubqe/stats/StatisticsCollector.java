@@ -8,8 +8,8 @@ import java.util.Set;
 
 import org.djutils.event.Event;
 import org.djutils.event.EventListener;
-import org.trustacean.pubsubqe.core.Message;
-import org.trustacean.pubsubqe.core.Subscriber;
+import org.trustacean.pubsubqe.domain.Message;
+import org.trustacean.pubsubqe.domain.Subscriber;
 
 import nl.tudelft.simulation.dsol.simulators.DevsSimulator;
 

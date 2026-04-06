@@ -3,7 +3,7 @@ package org.trustacean.pubsubqe.stats;
 import org.djutils.event.EventType;
 import org.djutils.metadata.MetaData;
 import org.djutils.metadata.ObjectDescriptor;
-import org.trustacean.pubsubqe.core.Subscriber;
+import org.trustacean.pubsubqe.domain.Subscriber;
 
 public class MatchResult {
 

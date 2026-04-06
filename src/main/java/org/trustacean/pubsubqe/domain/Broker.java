@@ -1,4 +1,4 @@
-package org.trustacean.pubsubqe.core;
+package org.trustacean.pubsubqe.domain;
 
 import java.util.ArrayList;
 import java.util.List;

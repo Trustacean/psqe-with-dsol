@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.djutils.event.Event;
-import org.trustacean.pubsubqe.core.Message;
+import org.trustacean.pubsubqe.domain.Message;
 
 public class EventContextCountReport extends Report {
     private final Map<String, Integer> contextCounts;

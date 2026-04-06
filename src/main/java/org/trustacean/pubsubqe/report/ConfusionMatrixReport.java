@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.djutils.event.Event;
-import org.trustacean.pubsubqe.core.Subscriber;
+import org.trustacean.pubsubqe.domain.Subscriber;
 import org.trustacean.pubsubqe.stats.MatchResult;
 
 public class ConfusionMatrixReport extends Report {

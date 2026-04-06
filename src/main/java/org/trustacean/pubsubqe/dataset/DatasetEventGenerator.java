@@ -4,8 +4,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import org.trustacean.pubsubqe.core.Message;
-import org.trustacean.pubsubqe.core.Publisher;
+import org.trustacean.pubsubqe.domain.Message;
+import org.trustacean.pubsubqe.domain.Publisher;
 
 import nl.tudelft.simulation.dsol.simulators.DevsSimulatorInterface;
 import nl.tudelft.simulation.jstats.distributions.DistExponential;

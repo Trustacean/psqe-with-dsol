@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.trustacean.pubsubqe.core.Message;
+import org.trustacean.pubsubqe.domain.Message;
 
 public class DatasetLoader {
 

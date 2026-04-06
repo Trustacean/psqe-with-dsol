@@ -1,4 +1,4 @@
-package org.trustacean.pubsubqe.core;
+package org.trustacean.pubsubqe.domain;
 
 import org.djutils.event.Event;
 import org.djutils.event.LocalEventProducer;
