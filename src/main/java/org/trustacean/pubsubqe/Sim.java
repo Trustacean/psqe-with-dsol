@@ -14,7 +14,5 @@ public class Sim {
         Replication<Double> replication = new SingleReplication<>("rep1", 0.0, 0.0, 100000.0);
         simulator.initialize(model, replication);
         simulator.start();
-
-        System.out.println("Simulation finished.");
     }
 }
