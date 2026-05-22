@@ -1,53 +1,39 @@
 package org.trustacean.pubsubqe.domain;
 
+import java.util.Arrays;
+import java.util.HashSet;
+
+import org.trustacean.pubsubqe.domain.gtrm.GlobalTermRelationshipModel;
+
 public class Subscriber {
 
-    private String[] keywords;
-    private String[] postProcessedKeywords;
+    private String topic;
+    private HashSet<String> keywords;
 
     public Subscriber(String... keywords) {
-        this.keywords = keywords;
-        this.postProcessedKeywords = new String[keywords.length];
-        for (int i = 0; i < keywords.length; i++) {
-            this.postProcessedKeywords[i] = keywords[i].toLowerCase();
+        init(keywords);
+    }
+
+    private void init(String... keywords) {
+        this.topic = "";
+        for (String keyword : keywords) {
+            this.topic = this.topic + keyword + " ";
         }
+
+        this.topic = this.topic.trim();
+        this.keywords = new HashSet<>(Arrays.asList(GlobalTermRelationshipModel.normalize(this.getTopic())));
     }
 
     public void setKeywords(String[] keywords) {
-        this.keywords = keywords;
-        setPostProcessedKeywords(keywords);
+        this.keywords.addAll(Arrays.asList(keywords));
     }
 
-    public void setPostProcessedKeywords(String[] postProcessedKeywords) {
-        this.postProcessedKeywords = postProcessedKeywords;
+    public HashSet<String> getKeywords() {
+        return this.keywords;
     }
 
-    public String[] getKeywords() {
-        return keywords;
-    }
-
-    public String getKeywordStr() {
-        String keystr = "";
-        for (String keyword : keywords) {
-            keystr = keystr + keyword + " ";
-        }
-
-        keystr = keystr.trim();
-        return keystr;
-    }
-
-    public String[] getPostProcessedKeywords() {
-        return postProcessedKeywords;
-    }
-
-    public boolean matches(Message msg) {
-        String text = msg.getText().toLowerCase();
-        for (String keyword : postProcessedKeywords) {
-            if (text.contains(keyword.toLowerCase())) {
-                return true;
-            }
-        }
-        return false;
+    public String getTopic() {
+        return this.topic;
     }
 
     public void receive(Message msg) {
