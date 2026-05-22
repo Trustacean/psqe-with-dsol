@@ -33,6 +33,17 @@
         <version>2.4.2</version>
         <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>edu.stanford.nlp</groupId>
+      <artifactId>stanford-corenlp</artifactId>
+      <version>4.5.4</version>
+    </dependency>
+    <dependency>
+      <groupId>edu.stanford.nlp</groupId>
+      <artifactId>stanford-corenlp</artifactId>
+      <version>4.5.4</version>
+      <classifier>models</classifier>
+    </dependency>
   </dependencies>
 
 </project>
