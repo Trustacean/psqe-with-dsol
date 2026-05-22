@@ -11,12 +11,13 @@ import java.util.Map;
 import org.djutils.event.Event;
 import org.djutils.event.EventListener;
 import org.djutils.math.functions.Nan;
+import org.trustacean.pubsubqe.Parameters;
 
 import nl.tudelft.simulation.dsol.simulators.DevsSimulator;
 
 public abstract class Report implements EventListener {
 
-    public static final String REPORT_DIR = "./reports/";
+    public static final String REPORT_DIR = "./reports/params_TopK_" + Parameters.TOP_K + "_WindowSize_" + Parameters.WINDOW_SIZE + "_RecomputeInterval_" + Parameters.RECOMPUTE_INTERVAL + "_ExpansionThreshold_" + Parameters.EXPANSION_THRESHOLD + "/";
     public static final String OUT_SUFFIX = ".csv";
     public static final String INTERVALLED_FORMAT ="%04d" + OUT_SUFFIX; 
 
@@ -32,7 +33,7 @@ public abstract class Report implements EventListener {
         this.outFileName = REPORT_DIR + namespace + OUT_SUFFIX;
         this.outputInterval = -1;
         this.lastOutputSuffix = 0;
-        checkDirExistence(namespace);
+        checkDirExistence(this.outFileName);
     }
 
     protected void init() {		
