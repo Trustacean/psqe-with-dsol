@@ -8,9 +8,11 @@ import org.trustacean.pubsubqe.domain.Broker;
 import org.trustacean.pubsubqe.domain.Message;
 import org.trustacean.pubsubqe.domain.Publisher;
 import org.trustacean.pubsubqe.domain.Subscriber;
+import org.trustacean.pubsubqe.domain.gtrm.GlobalTermRelationshipModel;
 import org.trustacean.pubsubqe.report.ConfusionMatrixReport;
 import org.trustacean.pubsubqe.report.EventContextCountReport;
 import org.trustacean.pubsubqe.report.OverallConfusionMatrixReport;
+import org.trustacean.pubsubqe.report.RelationshipReport;
 import org.trustacean.pubsubqe.report.Report;
 import org.trustacean.pubsubqe.stats.MatchResult;
 
@@ -28,16 +30,17 @@ public class Model extends AbstractDsolModel<Double, DevsSimulatorInterface<Doub
     @Override
     public void constructModel() {
         Publisher publisher = createPublisher();
-        Broker broker = createBroker(publisher);
+
+        GlobalTermRelationshipModel gtrm = new GlobalTermRelationshipModel();
+        Broker broker = createBroker(publisher, gtrm);
 
         registerSubscribers(broker);
 
         List<Message> dataset = loadDataset();
 
-        DatasetEventGenerator generator
-                = createGenerator(dataset, publisher);
+        DatasetEventGenerator generator = createGenerator(dataset, publisher);
 
-        initReports(broker, publisher);
+        initReports(broker, publisher, gtrm);
 
         generator.start();
     }
@@ -46,8 +49,8 @@ public class Model extends AbstractDsolModel<Double, DevsSimulatorInterface<Doub
         return new Publisher();
     }
 
-    private Broker createBroker(Publisher publisher) {
-        Broker broker = new Broker();
+    private Broker createBroker(Publisher publisher, GlobalTermRelationshipModel gtrm) {
+        Broker broker = new Broker(gtrm);
         publisher.addListener(broker, Message.MESSAGE_PUBLISHED_EVENT);
         return broker;
     }
@@ -72,7 +75,8 @@ public class Model extends AbstractDsolModel<Double, DevsSimulatorInterface<Doub
         broker.addSubscriber(new Subscriber("hiv", "baby", "cured"));
         broker.addSubscriber(new Subscriber("hostess", "bought", "by", "apollo"));
         broker.addSubscriber(new Subscriber("uk", "passes", "marriage", "bill"));
-        broker.addSubscriber(new Subscriber("arrest", "of", "craig", "wilson", "for", "drive-by", "shooting", "in", "d", "c"));
+        broker.addSubscriber(
+                new Subscriber("arrest", "of", "craig", "wilson", "for", "drive-by", "shooting", "in", "d", "c"));
         broker.addSubscriber(new Subscriber("boko", "haram", "kidnapped", "french", "tourists"));
         broker.addSubscriber(new Subscriber("pope", "washed", "muslims", "feet"));
         broker.addSubscriber(new Subscriber("eastern", "australia", "floods"));
@@ -119,18 +123,16 @@ public class Model extends AbstractDsolModel<Double, DevsSimulatorInterface<Doub
     }
 
     private DatasetEventGenerator createGenerator(List<Message> dataset, Publisher publisher) {
-        StreamInterface stream
-                = this.getStreamInformation().getStream("default");
+        StreamInterface stream = this.getStreamInformation().getStream("default");
 
         return new DatasetEventGenerator(
                 getSimulator(),
                 dataset,
                 publisher,
-                stream
-        );
+                stream);
     }
 
-    private void initReports(Broker broker, Publisher publisher) {
+    private void initReports(Broker broker, Publisher publisher, GlobalTermRelationshipModel gtrm) {
         Report cmr = new ConfusionMatrixReport("confusion_matrix");
         broker.addListener(cmr, MatchResult.MATCH_RESULT_EVENT);
         simulator.addListener(cmr, DevsSimulator.STOP_EVENT);
@@ -140,5 +142,7 @@ public class Model extends AbstractDsolModel<Double, DevsSimulatorInterface<Doub
         Report eccr = new EventContextCountReport("event_context_counts");
         publisher.addListener(eccr, Message.MESSAGE_PUBLISHED_EVENT);
         simulator.addListener(eccr, DevsSimulator.STOP_EVENT);
+        Report rr = new RelationshipReport("relationship_report", gtrm);
+        simulator.addListener(rr, DevsSimulator.STOP_EVENT);
     }
 }
