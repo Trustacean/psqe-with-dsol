@@ -7,7 +7,7 @@ import org.djutils.metadata.ObjectDescriptor;
 public class Message {
 
     private final String context;
-    private final String text;
+    private String text;
     public static final EventType MESSAGE_PUBLISHED_EVENT
             = new EventType("MESSAGE_PUBLISHED_EVENT",
                     new MetaData("MESSAGE_PUBLISHED_EVENT", "dataset message event",
@@ -18,6 +18,10 @@ public class Message {
 
     public Message(String Context, String text) {
         this.context = Context;
+        this.text = text;
+    }
+
+    public void setText(String text) {
         this.text = text;
     }
 
