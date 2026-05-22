@@ -1,8 +1,9 @@
 package org.trustacean.pubsubqe.report;
 
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.djutils.event.Event;
 import org.trustacean.pubsubqe.domain.Subscriber;
@@ -46,17 +47,24 @@ public class ConfusionMatrixReport extends Report {
 
     @Override
     public void done() {
-        for (Subscriber subscriber : truePositiveCounts.keySet()) {
+        Set<Subscriber> allSubscribers = new HashSet<>();
+
+        allSubscribers.addAll(truePositiveCounts.keySet());
+        allSubscribers.addAll(falsePositiveCounts.keySet());
+        allSubscribers.addAll(falseNegativeCounts.keySet());
+        allSubscribers.addAll(trueNegativeCounts.keySet());
+
+        for (Subscriber subscriber : allSubscribers) {
             int tp = truePositiveCounts.getOrDefault(subscriber, 0);
             int fp = falsePositiveCounts.getOrDefault(subscriber, 0);
             int fn = falseNegativeCounts.getOrDefault(subscriber, 0);
             int tn = trueNegativeCounts.getOrDefault(subscriber, 0);
 
-            write(("Subscriber: " + Arrays.toString(subscriber.getKeywords())));
-            write(("TP: " + tp));
-            write(("FP: " + fp));
-            write(("FN: " + fn));
-            write(("TN: " + tn));
+            write("Subscriber: " + subscriber.getTopic());
+            write("TP: " + tp);
+            write("FP: " + fp);
+            write("FN: " + fn);
+            write("TN: " + tn);
         }
 
         super.done();
