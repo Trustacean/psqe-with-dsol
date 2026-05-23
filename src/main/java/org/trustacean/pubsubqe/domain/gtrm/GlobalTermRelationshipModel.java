@@ -63,8 +63,7 @@ public class GlobalTermRelationshipModel implements EventListener {
         if (msg == null)
             return;
 
-        String[] terms = normalize(msg.getText());
-        addToWindow(terms);
+        addToWindow(msg.getText().split("\\s+"));
 
         if (++this.messageCount % RECOMPUTE_INTERVAL == 0) {
             recomputeModel();
