@@ -17,7 +17,7 @@ import nl.tudelft.simulation.dsol.simulators.DevsSimulator;
 
 public abstract class Report implements EventListener {
 
-    public static final String REPORT_DIR = "./reports/params_TopK_" + Parameters.TOP_K + "_WindowSize_" + Parameters.WINDOW_SIZE + "_RecomputeInterval_" + Parameters.RECOMPUTE_INTERVAL + "_ExpansionThreshold_" + Parameters.EXPANSION_THRESHOLD + "/";
+    public static final String REPORT_DIR = "./reports/" + Parameters.MATCHING_STRATEGY + "_TopK_" + Parameters.TOP_K + "_WindowSize_" + Parameters.WINDOW_SIZE + "_RecomputeInterval_" + Parameters.RECOMPUTE_INTERVAL + "_ExpansionThreshold_" + Parameters.EXPANSION_THRESHOLD + "/";
     public static final String OUT_SUFFIX = ".csv";
     public static final String INTERVALLED_FORMAT ="%04d" + OUT_SUFFIX; 
 
