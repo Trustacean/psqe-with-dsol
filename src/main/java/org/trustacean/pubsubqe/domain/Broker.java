@@ -1,10 +1,8 @@
 package org.trustacean.pubsubqe.domain;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.djutils.event.Event;
 import org.djutils.event.EventListener;
@@ -42,7 +40,7 @@ public class Broker extends LocalEventProducer implements EventListener {
 
         for (Subscriber subscriber : this.subscribers) {
 
-            boolean matches = matchesWithRelevancyScore(subscriber, msg);
+            boolean matches = matches(subscriber, msg);
             boolean isRelevant = msg.getContext().equals(subscriber.getTopic());
 
             if (matches) {
@@ -56,8 +54,17 @@ public class Broker extends LocalEventProducer implements EventListener {
     }
 
     private boolean matches(Subscriber subscriber, Message msg) {
-        Set<String> words = Arrays.stream(msg.getText().split("\\s+"))
-                .collect(Collectors.toSet());
+        return switch (Parameters.MATCHING_STRATEGY) {
+            case AND_MATCH -> matchesAnd(subscriber, msg);
+            case OR_MATCH -> matchesOr(subscriber, msg);
+            case AND_EXPANSION -> matchesAndExpansion(subscriber, msg);
+            case OR_EXPANSION -> matchesOrExpansion(subscriber, msg);
+            case RELEVANCY_SCORE -> matchesWithRelevancyScore(subscriber, msg);
+        };
+    }
+
+    private boolean matchesOr(Subscriber subscriber, Message msg) {
+        Set<String> words = msg.getTokenizedWords();
 
         for (String keyword : subscriber.getKeywords()) {
             if (words.contains(keyword)) {
@@ -68,9 +75,20 @@ public class Broker extends LocalEventProducer implements EventListener {
         return false;
     }
 
+    private boolean matchesAnd(Subscriber subscriber, Message msg) {
+        Set<String> words = msg.getTokenizedWords();
+
+        for (String keyword : subscriber.getKeywords()) {
+            if (!words.contains(keyword)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private boolean matchesOrExpansion(Subscriber subscriber, Message msg) {
-        Set<String> words = Arrays.stream(msg.getText().split("\\s+"))
-                .collect(Collectors.toSet());
+        Set<String> words = msg.getTokenizedWords();
 
         for (String keyword : subscriber.getKeywords()) {
 
@@ -93,8 +111,7 @@ public class Broker extends LocalEventProducer implements EventListener {
     }
 
     private boolean matchesAndExpansion(Subscriber subscriber, Message msg) {
-        Set<String> words = Arrays.stream(msg.getText().split("\\s+"))
-                .collect(Collectors.toSet());
+        Set<String> words = msg.getTokenizedWords();
 
         for (String keyword : subscriber.getKeywords()) {
 
@@ -121,8 +138,7 @@ public class Broker extends LocalEventProducer implements EventListener {
     }
 
     private boolean matchesWithRelevancyScore(Subscriber subscriber, Message msg) {
-        Set<String> words = Arrays.stream(msg.getText().split("\\s+"))
-                .collect(Collectors.toSet());
+        Set<String> words = msg.getTokenizedWords();
 
         int subscriberKeywordCount = subscriber.getKeywords().size();
         double score = 0; // Score must be between 0 and 1
@@ -133,15 +149,12 @@ public class Broker extends LocalEventProducer implements EventListener {
             } else {
                 var expanded = gtrm.expand(keyword, Parameters.EXPANSION_THRESHOLD);
 
-                double bestExpansion = 0;
 
-                for (RankedTerm rankedTerm : expanded) {
-                    if (words.contains(rankedTerm.getTerm())) {
-                        bestExpansion = Math.max(bestExpansion, rankedTerm.getRank());
-                    }
-                }
-
-                score += 2 * Math.sqrt(bestExpansion)
+                score += 10 * Math.sqrt(expanded.stream()
+                        .filter(rankedTerm -> words.contains(rankedTerm.getTerm()))
+                        .mapToDouble(RankedTerm::getRank)
+                        .max()
+                        .orElse(0.0))
                         / subscriberKeywordCount;
             }
         }
